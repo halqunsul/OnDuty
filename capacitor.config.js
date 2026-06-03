@@ -1,7 +1,7 @@
 const config = {
   appId: 'com.onduty.app',
   appName: 'OnDuty',
-  webDir: '.',
+  webDir: 'www',
   bundledWebRuntime: false
 };
 
