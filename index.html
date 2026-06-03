@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ar" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Duty Manager Report</title>
+  <link rel="stylesheet" href="style.css?v=66-master">
+
+
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a3d62">
+</head>
+
+<!-- FINAL REPORT MODAL -->
+<div id="finalBack" class="finalReportShell" style="display:none;">
+  <div class="finalReportModal" role="dialog" aria-modal="true" aria-labelledby="finalReportTitle">
+    <div class="finalReportTopbar">
+      <button class="secondaryBtn" id="btnFinalClose" type="button">← Back</button>
+      <div class="finalReportTopTitle" id="finalReportTitle">Final Report / التقرير النهائي</div>
+      <div class="finalReportMeta" id="finalMeta"></div>
+    </div>
+    <div class="finalReportScroll" id="finalReportScroll">
+      <div id="finalReportArea"></div>
+    </div>
+    <div class="finalReportActions">
+      <button class="primaryBtn" id="btnFinalPdf" type="button" title="Save the official report as PDF using Print / Save as PDF">📄 Save PDF</button>
+      <button class="secondaryBtn" id="btnFinalShare" type="button" title="Instructions to share the saved PDF from device files">🔗 Share PDF</button>
+      <button class="secondaryBtn" id="btnFinalMail" type="button" title="Open an email draft after saving the PDF">📧 Email PDF</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- REPORT COMPLETENESS CHECK MODAL -->
+<div id="completenessBack" class="modalBack completenessBack" style="display:none;">
+  <div class="modal completenessModal" role="dialog" aria-modal="true" aria-labelledby="completenessTitle">
+    <div class="modalTitle" id="completenessTitle">Report Completeness Check</div>
+    <div class="completenessIntro">
+      Please review the following items before issuing the final report. You can continue if the report must be generated now.
+    </div>
+    <div id="completenessList" class="completenessList"></div>
+    <div class="modalActions completenessActions">
+      <button type="button" class="secondaryBtn" id="btnCompletenessBack">Go Back</button>
+      <button type="button" class="primaryBtn" id="btnCompletenessContinue">Continue to Final Report</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- REPORT ARCHIVE / SHIFT HISTORY MODAL -->
+<div id="archiveBack" class="modalBack archiveBack" style="display:none;">
+  <div class="modal archiveModal" role="dialog" aria-modal="true" aria-labelledby="archiveTitle">
+    <div class="archiveHeaderRow">
+      <div>
+        <div class="modalTitle" id="archiveTitle">Report Archive / Shift History</div>
+        <div class="archiveIntro">Saved final reports are stored on this device for review and repeated-issue tracking.</div>
+      </div>
+      <button type="button" class="secondaryBtn" id="btnArchiveClose">Close</button>
+    </div>
+    <div id="archiveList" class="archiveList"></div>
+  </div>
+</div>
+
+
+
+<!-- WEEKLY KPI ANALYTICS MODAL -->
+<div id="weeklyKpiBack" class="modalBack weeklyKpiBack" style="display:none;">
+  <div class="modal weeklyKpiModal" role="dialog" aria-modal="true" aria-labelledby="weeklyKpiTitle">
+    <div class="archiveHeaderRow">
+      <div>
+        <div class="modalTitle" id="weeklyKpiTitle">Weekly KPI Analytics</div>
+        <div class="archiveIntro">Weekly operational summary based on archived daily reports.</div>
+      </div>
+      <button type="button" class="secondaryBtn" id="btnWeeklyKpiClose">Close</button>
+    </div>
+    <div id="weeklyKpiArea" class="weeklyKpiArea"></div>
+    <div class="modalActions completenessActions">
+      <button type="button" class="primaryBtn" id="btnWeeklyKpiShare">Share Weekly Report</button>
+    </div>
+  </div>
+</div>
+
+<body>
+<input id="imgPick" type="file" accept="image/*" hidden multiple>
+<input id="imgCam"  type="file" accept="image/*" capture="environment" hidden>
+<header class="topbar">
+  <div class="bar">
+  <div class="left">
+    <button class="iconBtn" id="btnHome" title="Home">🏠</button>
+    <label class="langSwitch" title="AR / EN">
+  <input type="checkbox" id="langToggle" aria-label="Language toggle">
+  <span class="track">
+    <span class="knob"></span>
+    <span class="lbl lblAR">AR</span>
+    <span class="lbl lblEN">EN</span>
+  </span>
+</label>
+    
+<div class="onDutyInlineField">
+  <label for="onDutyInput">On Duty</label>
+  <input type="text" id="onDutyInput" placeholder="Enter name" />
+</div>
+
+<div class="onDutyInlineField shiftInlineField">
+  <label for="globalShift">Shift</label>
+  <select id="globalShift" aria-label="Shift">
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+  </select>
+</div>
+
+<button class="pillBtn" id="btnFinal">📤 Final Report</button>
+<button class="pillBtn archiveTopBtn" id="btnArchive" type="button">🗂 Archive</button>
+  </div>
+
+  <div class="title"></div>
+
+  <div class="right"><button class="resetTopBtn" id="btnTopReset" title="Reset">Reset</button></div>
+</div>
+
+
+</header>
+
+<main class="container">
+
+  <!-- HOME / DEPTS -->
+  <section id="screenHome" class="card">
+  <div class="homeHero">
+  <div class="mainReportTitle">Duty Manager Report</div>
+  <div class="homeSub">اختر القسم لفتح صفحة التقرير</div>
+
+    <!-- Wave SVG -->
+    <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="rgba(255,255,255,0.85)"
+        d="M0,64L60,58.7C120,53,240,43,360,53.3C480,64,600,96,720,101.3C840,107,960,85,1080,69.3C1200,53,1320,43,1380,37.3L1440,32L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z">
+      </path>
+    </svg>
+  </div>
+
+  <div class="homeContent">
+    <div id="deptGrid" class="deptGrid"></div>
+
+    <!-- RESET (ALL) -->
+    <div class="resetBox">
+      <div class="resetTitle">Reset</div>
+      <div class="muted">يمسح جميع الملاحظات والبيانات المحفوظة من كل الأقسام.</div>
+      <button class="resetBtn" id="btnResetAll">🧹 Reset All</button>
+
+
+    </div>
+  </div>
+</section>
+
+
+  <!-- REPORT -->
+  <section id="screenReport" class="card" style="display:none;">
+    <div class="reportHeader">
+      <div class="rhLeft">
+        <div class="muted" id="deptKeySmall"></div>
+        <div class="hTitle" id="deptTitle"></div>
+        <div class="muted" id="dateTime"></div>
+      </div>
+
+      <div class="rhRight">
+        <button class="secondaryBtn" id="btnBack">← Back</button>
+      </div>
+    </div>
+
+    <div class="grid2 employeeOnlyGrid">
+      <div>
+        <label>Employee Count / عدد الموظفين</label>
+        <input id="employeeCount" type="number" placeholder="مثال: 12" />
+      </div>
+    </div>
+
+
+    <div class="savedNotesWrap sectionNotesWrap">
+      <div class="savedNotesTitle">Section Notes / ملاحظات القسم</div>
+      <div id="savedSectionNotes" class="sectionNotesGrid"></div>
+      <div id="savedSectionNotesEmpty" class="savedNotesEmpty">No saved notes yet.</div>
+      <div class="savedNotesActions"><button type="button" class="secondaryBtn" id="btnAddSectionNote">+ Add Note</button></div>
+    </div>
+
+    <div id="deptIssueWrap" class="issueBox">
+      <div class="toggleRow" style="margin-top:10px;">
+        <label class="checkboxLabel">
+          <input type="checkbox" id="deptEnableDetails" />
+          <span id="deptIssueState" class="issueState">Issues / توجد ملاحظات</span>
+        </label>
+      </div>
+
+      <div id="deptDetailsBlock">
+        <div id="deptIssueBlock">
+          <div class="issueCardsWrap">
+            <div class="savedNotesTitle">Issues List / قائمة الملاحظات</div>
+            <div id="savedIssueNotesChips" class="issueCardsList"></div>
+            <div id="savedIssueNotesEmpty" class="savedNotesEmpty">No issues yet.</div>
+            <div class="savedNotesActions">
+              <button type="button" class="secondaryBtn" id="btnNewDeptIssueNote">+ Add Issue</button>
+            </div>
+            <div id="deptIssueDraftHint" class="savedNotesEmpty">Press + Add Issue to add a new issue.</div>
+          </div>
+
+          <div id="deptIssueEditor" class="issueEditorBox" style="display:none;">
+            <div class="grid2" style="margin-top:10px;">
+              <div>
+                <label>Category</label>
+                <select id="deptCategory"></select>
+                <input id="deptCategoryOther" class="noteField" style="display:none; margin-top:6px;" placeholder="General: specify the note category..." />
+              </div>
+
+              <div class="issueSeverityField">
+                <label>Severity</label>
+                <select id="deptSeverity" class="levelSelect">
+                  <option value="LOW">LOW</option>
+                  <option value="MEDIUM">MEDIUM</option>
+                  <option value="HIGH">HIGH</option>
+                  <option value="CRITICAL">CRITICAL</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <label>Issue Description / وصف المشكلة</label>
+              <textarea id="deptIssueDesc" class="issueDescField" rows="3" placeholder="اكتب وصف مختصر للمشكلة..."></textarea>
+            </div>
+
+            <div class="issueActionFieldWrap" style="margin-top:12px;">
+              <label>Action Taken / الإجراء المتخذ</label>
+              <textarea id="deptAction" class="issueActionField" rows="4" placeholder="اكتب الإجراء الذي تم اتخاذه..."></textarea>
+            </div>
+
+            <div class="noteTools" style="margin-top:12px;">
+              <button type="button" id="btnAttachIssue" class="toolBtn toolBtnAttach">🖼️ Attach Image</button>
+              <button type="button" id="btnCameraIssue" class="toolBtn toolBtnCamera">📷 Camera</button>
+            </div>
+            <div id="issueImgs" class="imgRow"></div>
+            <div class="savedNotesActions" style="margin-top:12px;">
+              <button type="button" class="primaryBtn" id="btnSaveIssueNote">Save Issue</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <textarea id="summary" class="arField" style="display:none" placeholder="اكتب ملخص..."></textarea>
+    <textarea id="notes" class="arField" style="display:none" placeholder="اكتب ملاحظات..."></textarea>
+
+</div>
+
+<div class="actionsRow">
+  <button class="resetBtn sectionReset" id="btnResetDept">🧹 Reset Section</button>
+  <div class="muted" id="saveStatus"></div>
+</div>
+
+    <hr class="sep" />
+
+<div class="safetyHeader">
+      <div class="h3">Safety Entries / إدخالات السلامة</div>
+      <button class="primaryBtn" id="btnAddSafety">+ Add Safety Entry</button>
+    </div>
+
+    <div id="v63SafetySummary" class="v63SummaryBlock"></div>
+    <div id="sevCounters" class="sevCounters"></div>
+    <div id="safetyList" class="safetyList"></div>
+
+    <div class="printHint muted">
+      للتصدير PDF: اضغط PDF ثم اختر Save as PDF من نافذة الطباعة.
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL: ADD/EDIT SAFETY NOTE -->
+<!-- SAFETY NOTE SCREEN -->
+<section id="screenSafety" class="screen" style="display:none;">
+  <div class="reportHeader">
+    <div class="hTitle">Safety Entry / إدخال سلامة</div>
+    <button class="secondaryBtn" id="btnSafetyBack">← رجوع</button>
+  </div>
+
+  <div class="card">
+    <div class="savedNotesWrap">
+      <div class="savedNotesTitle">Safety Notes / ملاحظات السلامة</div>
+      <div id="savedSafetyNotesChips" class="savedNotesChips"></div>
+      <div id="savedSafetyNotesEmpty" class="savedNotesEmpty">No safety notes yet.</div>
+      <div class="savedNotesActions"><button type="button" class="secondaryBtn" id="btnNewSafetyNote">+ Add Note</button></div>
+      <div id="safetyDraftHint" class="savedNotesEmpty">Press + Add Safety Entry from the section page to create a new safety entry, or open an existing one to edit.</div>
+    </div>
+    <div id="safetyDraftEditor" style="display:none;">
+    <div class="noteHeaderRow">
+  <label>Description / وصف ملاحظة السلامة</label>
+  <button type="button" class="addNoteBtn" id="btnAddSafetyLine">＋</button>
+</div>
+<textarea id="sNoteText" class="noteField" style="display:none" placeholder="اكتب الملاحظة..."></textarea>
+<div id="safetyNoteList" class="noteList"></div>
+
+    <div class="grid2 v63Insert">
+      <div class="selectBox">
+        <div class="boxTitle">Entry Type</div>
+        <select id="sEntryType" class="levelSelect">
+          <option value="NOTE">Safety Note</option>
+          <option value="OBSERVATION">Safety Observation</option>
+        </select>
+      </div>
+      <div class="selectBox">
+        <div class="boxTitle">Consequence</div>
+        <select id="sConsequence" class="levelSelect">
+          <option value="People">People</option>
+          <option value="Environment">Environment</option>
+          <option value="Asset">Asset</option>
+          <option value="Operation">Operation</option>
+          <option value="Reputation">Reputation</option>
+          <option value="Financial">Financial</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:none; margin-top:10px;">
+      <label>Category</label>
+      <select id="sCategory"></select>
+      <input id="sCategoryOther" class="noteField" style="display:none; margin-top:6px;" />
+    </div>
+
+    <div class="grid2">
+      <div class="selectBox">
+        <div class="boxTitle">Likelihood</div>
+        <select id="sLikelihood" class="levelSelect" onchange="window.v63RefreshSafetyUI && window.v63RefreshSafetyUI()">
+          <option value="RARE">Rare</option>
+          <option value="UNLIKELY">Unlikely</option>
+          <option value="POSSIBLE" selected>Possible</option>
+          <option value="LIKELY">Likely</option>
+          <option value="ALMOST CERTAIN">Almost Certain</option>
+        </select>
+      </div>
+
+      <div class="selectBox">
+        <div class="boxTitle">Severity</div>
+        <select id="sSeverityImpact" class="levelSelect">
+          <option value="LOW">Low</option>
+          <option value="MEDIUM" selected>Medium</option>
+          <option value="HIGH">High</option>
+          <option value="CRITICAL">Critical</option>
+          <option value="EXTREME">Extreme</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:10px;">
+      <div class="selectBox">
+        <div class="boxTitle">Risk Level</div>
+        <div id="sRiskLevel" class="pill medium" style="display:inline-block;">MEDIUM</div>
+        <div id="sRiskFormula" class="riskFormula">Risk Score = Likelihood × Severity</div>
+      </div>
+
+      <div class="selectBox">
+        <div class="boxTitle">Classification</div>
+        <input id="sAutoCategory" class="noteField" readonly />
+      </div>
+    </div>
+
+    <div id="sEscalationWarn" class="v63Warn" style="display:none;">⚠ High Risk – Escalation Required</div>
+
+    <div class="selectBox" id="sActionWrapV63" style="margin-top:10px; display:none;">
+      <div class="boxTitle">Recommended Action / الإجراء المقترح</div>
+      <textarea id="sSuggestedAction" class="noteField" rows="4" placeholder="Recommended action appears for Medium risk"></textarea>
+    </div>
+
+    <div class="selectBox" id="actionTakenWrap" style="margin-top:10px;">
+      <div class="boxTitle">Action Taken / Required Action</div>
+      <textarea id="actionTaken" class="noteField" rows="3" placeholder="Describe the actual action taken..."></textarea>
+    </div>
+
+    <div class="noteTools" style="margin-top:12px;">
+      <button type="button" id="btnAttachSafety" class="toolBtn toolBtnAttach">🖼️ Attach Image</button>
+      <button type="button" id="btnCameraSafety" class="toolBtn toolBtnCam">📷 Camera</button>
+    </div>
+
+    <div id="safetyImgs" class="noteImages"></div>
+
+    <div class="actionsRow" style="margin-top:14px;">
+      <button class="primaryBtn" id="btnSafetySave">Save Safety Note</button>
+    </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<div id="sectionNoteModalBack" class="modalBack" style="display:none;">
+  <div class="modal" style="max-width:680px;">
+    <div class="modalTitle" id="sectionNoteModalTitle">Add Note / إضافة ملاحظة</div>
+    <div>
+      <label>Note Text / نص الملاحظة</label>
+      <textarea id="sectionNoteText" class="noteField" rows="6" placeholder="اكتب الملاحظة هنا..."></textarea>
+    </div>
+    <div class="modalActions" style="margin-top:12px; justify-content:flex-end; gap:10px;">
+      <button type="button" class="secondaryBtn" id="btnSectionNoteCancel">Cancel</button>
+      <button type="button" class="primaryBtn" id="btnSectionNoteSave">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.bundle.js?v=66-master"></script>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js?v=65-final');
+}
+</script>
+</body>
+
+</html>
